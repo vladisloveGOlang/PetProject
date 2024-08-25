@@ -13,6 +13,7 @@ import (
 
 var DB = data.DB
 
+// rdhdrrth sdfgazsdfgz
 func main() {
 
 	//инициализация переменной DB как базы данных
