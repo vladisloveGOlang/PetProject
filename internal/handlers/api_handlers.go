@@ -1,17 +1,18 @@
 package handlers
 
 import (
+	//"fmt"
 	"fmt"
 	"io"
 	"net/http"
 
 	data "first/internal/database"
+
 	ms "first/internal/messagesService"
-	"log"
+	//"log"
 
 	"encoding/json"
-
-	"strings"
+	//"strings"
 	//"github.com/gorilla/mux"
 )
 
@@ -25,7 +26,7 @@ func NewHandler(service *ms.MessageService) *Handler {
 	}
 }
 
-func (h *Handler) GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetMessageHandler(w http.ResponseWriter, r *http.Request) {
 	messages, err := h.Service.GetAllMessages()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -38,77 +39,44 @@ var DB = data.DB
 
 var msg ms.Message
 
-func GetHandler(w http.ResponseWriter, r *http.Request) {
-
-	//создаем слайс куда будем сохранять содержимое нашеё БД
-	var texts []string
-
-	//устанавливем с что хотим работать с моделью мессадж в DB,
-	//Планком из столбца текст вытаскиваем значения в наш слайс
-	result := DB.Model(&ms.Message{}).Pluck("Text", &texts)
-	if result.Error != nil {
-		fmt.Println("Error reading from database:", result.Error)
+func (h *Handler) PostMessageHandler(w http.ResponseWriter, r *http.Request) {
+	var message ms.Message
+	err := json.NewDecoder(r.Body).Decode(&message)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	createdMessage, err := h.Service.CreateMessage(message)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	//склеиваем слайс через новую строку
-	text := strings.Join(texts, "\n")
-
-	fmt.Fprintln(w, text)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(createdMessage)
 }
 
-func PostHandler(w http.ResponseWriter, r *http.Request) {
-
+func (h *Handler) DeleteMessageByIDHandler(w http.ResponseWriter, r *http.Request) {
 	JsonFromRtoMSG(w, r)
-
-	// Добавляем запись в базу данных
-	result := DB.Create(&msg)
-	if result.Error != nil {
-		log.Fatalf("Ошибка при создании записи: %v", result.Error)
-		http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
+	err := h.Service.DeleteMessage(msg.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError) ////////////////////////////////////////////////////////////////////// Не понимаю как писать обработку ошибок
 		return
 	}
-
-	// Возвращаем успешный ответ
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Сообщение успешно добавлено"))
+	ans := fmt.Sprintf("строка с id: %v удалена", msg.ID)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(ans)
 }
 
-var lastValue ms.Message
-
-func PatchHandler(w http.ResponseWriter, r *http.Request) {
-
+func (h *Handler) UpdateMessageByID(w http.ResponseWriter, r *http.Request) {
 	JsonFromRtoMSG(w, r)
-
-	lastValue.ID = msg.ID
-
-	result := DB.First(&lastValue, msg.ID)
-
-	messLast := fmt.Sprintf("Текущие значения:\nID : %v, Text :%s", lastValue.ID, lastValue.Text)
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(messLast))
-	if result.Error != nil {
-		fmt.Println("Error reading from database:", result.Error)
+	Message, err := h.Service.PatchMessage(msg.ID, msg)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError) ////////////////////////////////////////////////////////////////////// Не понимаю как писать обработку ошибок
 		return
 	}
-
-	result = DB.Updates(&msg)
-
-	if result.RowsAffected == 0 {
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("Изменнений не произошло"))
-		return
-	}
-	if result.Error != nil {
-		log.Fatalf("Ошибка при обновлении записи: %v", result.Error)
-		http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
-		return
-	}
-	// Возвращаем успешный ответ
-	status := fmt.Sprintf("\nОбновление совершено, Текущие значения:\nID : %v, Text :%s", msg.ID, msg.Text)
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(status))
-
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(Message)
 }
 
 // Распаршивает json из запроса в msg
@@ -121,26 +89,5 @@ func JsonFromRtoMSG(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-}
-
-func DeleteHandler(w http.ResponseWriter, r *http.Request) {
-	JsonFromRtoMSG(w, r)
-	result := DB.Delete(&msg)
-	if result.RowsAffected == 0 {
-		errorText := fmt.Sprintf("Изменнений не произошло так как строка c id %d не существует", msg.ID)
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(errorText))
-		return
-	}
-	if result.Error != nil {
-		log.Fatalf("Ошибка при удалении записи: %v", result.Error)
-		http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
-
-		return
-	}
-	// Возвращаем успешный ответ
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Обновление совершено"))
 
 }

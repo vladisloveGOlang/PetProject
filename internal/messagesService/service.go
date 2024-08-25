@@ -16,10 +16,10 @@ func (s *MessageService) GetAllMessages() ([]Message, error) {
 	return s.repo.GetAllMessages()
 }
 
-func (s *MessageService) PatchMessage(id int, message Message) (Message, error) {
+func (s *MessageService) PatchMessage(id uint, message Message) (Message, error) {
 	return s.repo.UpdateMessageByID(id, message)
 }
 
-func (s *MessageService) DeleteMessage(id int) error {
+func (s *MessageService) DeleteMessage(id uint) error {
 	return s.repo.DeleteMessageByID(id)
 }
