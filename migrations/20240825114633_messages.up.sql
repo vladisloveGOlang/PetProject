@@ -1,4 +1,4 @@
-CREATE TABLE messages (
+CREATE TABLE test (
     id SERIAL PRIMARY KEY,
     text VARCHAR(255) NOT NULL
 );
