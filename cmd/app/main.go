@@ -1,14 +1,16 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
-	"first/internal/database"
 	data "first/internal/database"
 	hand "first/internal/handlers"
 	ms "first/internal/messagesService"
 
-	"github.com/gorilla/mux"
+	"first/internal/web/messages"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 var DB = data.DB
@@ -22,22 +24,22 @@ func main() {
 	DB.AutoMigrate(ms.Message{})
 
 	//создание струтуры и методов работы с этой струтурой репозитория
-	repo := ms.NewMessageRepository(database.DB)
-
+	repo := ms.NewMessageRepository(data.DB)
 	//Создание методов работы с репозиторием
 	service := ms.NewService(repo)
 
 	//создание методов работы с сервисом
 	handler := hand.NewHandler(service)
 
-	//создаем роутер
-	router := mux.NewRouter()
+	e := echo.New()
 
-	//при заданном адресе. запускаем метод PostMessageHandler из струтуры хендлер, он вызывает метод CreateMessage из
-	router.HandleFunc("/postjson", handler.PostMessageHandler).Methods("POST")
-	router.HandleFunc("/api/hello", handler.GetMessageHandler).Methods("GET")
-	router.HandleFunc("/patch", handler.UpdateMessageByID).Methods("PATCH")
-	router.HandleFunc("/delete", handler.DeleteMessageByIDHandler).Methods("DELETE")
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-	http.ListenAndServe(":8080", router)
+	strictHandler := messages.NewStrictHandler(handler, nil)
+	messages.RegisterHandlers(e, strictHandler)
+
+	if err := e.Start(":8080"); err != nil {
+		log.Fatalf("faoled to start with err: %v", err)
+	}
 }
