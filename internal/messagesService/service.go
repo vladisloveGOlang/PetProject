@@ -1,5 +1,7 @@
 package messagesService
 
+import "first/internal/web/messages"
+
 type MessageService struct {
 	repo MessageRepository
 }
@@ -16,7 +18,7 @@ func (s *MessageService) GetAllMessages() ([]Message, error) {
 	return s.repo.GetAllMessages()
 }
 
-func (s *MessageService) PatchMessage(id uint, message Message) (Message, error) {
+func (s *MessageService) PatchMessage(id uint, message messages.Message) (messages.Message, error) {
 	return s.repo.UpdateMessageByID(id, message)
 }
 

@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"gorm.io/gorm"
+
+	"first/internal/web/messages"
 )
 
 type MessageRepository interface {
@@ -18,7 +20,7 @@ type MessageRepository interface {
 
 	// UpdateMessageByID - Передаем id и Message, возвращаем обновленный Message
 	// и ошибку
-	UpdateMessageByID(id uint, message Message) (Message, error)
+	UpdateMessageByID(id uint, message messages.Message) (messages.Message, error)
 
 	// DeleteMessageByID - Передаем id для удаления, возвращаем только ошибку
 	DeleteMessageByID(id uint) error
@@ -47,10 +49,10 @@ func (r *messageRepository) GetAllMessages() ([]Message, error) {
 	return messages, err
 }
 
-func (r *messageRepository) UpdateMessageByID(id uint, message Message) (Message, error) {
+func (r *messageRepository) UpdateMessageByID(id uint, message messages.Message) (messages.Message, error) {
 	result := r.db.Model(&message).Omit("id").Updates(map[string]interface{}{
 		"id":   id,
-		"text": message.Text,
+		"text": message.Message,
 	})
 	if result.Error != nil {
 		return message, result.Error

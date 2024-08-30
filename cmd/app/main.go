@@ -31,9 +31,14 @@ func main() {
 	//создание методов работы с сервисом
 	handler := hand.NewHandler(service)
 
+	// создем эхо для маршрутизации http запросов
 	e := echo.New()
 
+	//Логирует каждый входящий HTTP-запрос и его параметры
 	e.Use(middleware.Logger())
+
+	//Восстанавливает приложение после паники, предотвращая падение сервера
+	//и возвращая ответ с ошибкой.
 	e.Use(middleware.Recover())
 
 	strictHandler := messages.NewStrictHandler(handler, nil)
