@@ -1,13 +1,11 @@
 package main
 
 import (
-	"log"
-
 	data "first/internal/database"
 	hand "first/internal/handlers"
 	ms "first/internal/messagesService"
-
 	"first/internal/web/messages"
+	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

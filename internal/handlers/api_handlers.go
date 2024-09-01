@@ -51,16 +51,17 @@ func (h *Handler) PatchMessages(ctx context.Context, request messages.PatchMessa
 		return nil, err
 	}
 
-	var response messages.PatchMessagesResponseObject
+	var response messages.PatchMessages200JSONResponse
 
-	data, err := json.Marshal(messageToPatch)
+	data, err := json.Marshal(messageRequest)
 	if err != nil {
-		log.Fatalf("Не удалось записать положительнуй ответ: %v", err)
+		log.Fatal("json не раскодируется")
 	}
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Fatalf("Не удалось записать положительнуй ответ: %v", err)
+		log.Fatal("json не закодирывается")
 	}
+
 	return response, nil
 }
 
