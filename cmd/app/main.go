@@ -21,7 +21,10 @@ func main() {
 	//инициализация переменной DB как базы данных
 	DB = data.InitDB()
 	//создание струтуры этой базы
-	DB.AutoMigrate(ms.Message{})
+	err := DB.AutoMigrate(ms.Message{})
+	if err != nil {
+		log.Fatalf("Ошибка при миграции: %v", err)
+	}
 
 	//создание струтуры и методов работы с этой струтурой репозитория
 	repo := ms.NewMessageRepository(data.DB)

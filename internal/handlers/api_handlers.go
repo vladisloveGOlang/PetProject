@@ -10,9 +10,9 @@ import (
 	data "first/internal/database"
 	"first/internal/web/messages"
 
+	"encoding/json"
 	ms "first/internal/messagesService"
-	//"log"
-	//"encoding/json"
+	"log"
 	//"strings"
 	//"github.com/gorilla/mux"
 )
@@ -51,9 +51,15 @@ func (h *Handler) PatchMessages(ctx context.Context, request messages.PatchMessa
 		return nil, err
 	}
 
-	response := messages.PatchMessages200JSONResponse{
-		Id:      messageToPatch.Id,
-		Message: messageToPatch.Message,
+	var response messages.PatchMessagesResponseObject
+
+	data, err := json.Marshal(messageToPatch)
+	if err != nil {
+		log.Fatalf("Не удалось записать положительнуй ответ: %v", err)
+	}
+	err = json.Unmarshal(data, &response)
+	if err != nil {
+		log.Fatalf("Не удалось записать положительнуй ответ: %v", err)
 	}
 	return response, nil
 }
