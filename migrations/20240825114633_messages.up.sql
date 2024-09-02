@@ -1,4 +1,6 @@
-CREATE TABLE test (
+CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    text VARCHAR(255) NOT NULL
+    text VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) NOT NULL,
+    Password VARCHAR(255) NOT NULL,
 );
