@@ -9,6 +9,7 @@ import (
 
 var DB *gorm.DB
 
+// message
 func InitDB() *gorm.DB {
 	// в dsn вводим данные, которые мы указали при создании контейнера
 	dsn := "host=localhost user=postgres password=yourpassword dbname=postgres port=5432 sslmode=disable"
@@ -19,3 +20,5 @@ func InitDB() *gorm.DB {
 	}
 	return DB
 }
+
+//users
