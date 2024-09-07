@@ -7,6 +7,8 @@ import (
 	"first/internal/web/messages"
 	"log"
 
+	us "first/internal/userService"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -26,8 +28,15 @@ func main() {
 
 	//создание струтуры и методов работы с этой струтурой репозитория
 	repo := ms.NewMessageRepository(data.DB)
+
 	//Создание методов работы с репозиторием
 	service := ms.NewService(repo)
+
+	urepo := us.CreateUsersRepsitory(data.DB)
+
+	uservice := us.CreateUserService(urepo)
+
+	uHandler := hand.NewUHandler(uservice)
 
 	//создание методов работы с сервисом
 	handler := hand.NewHandler(service)

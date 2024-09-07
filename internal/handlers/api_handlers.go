@@ -8,18 +8,39 @@ import (
 	//"net/http"
 
 	data "first/internal/database"
+
 	"first/internal/web/messages"
 
 	"encoding/json"
 	ms "first/internal/messagesService"
 	"log"
+
 	//"strings"
 	//"github.com/gorilla/mux"
+	us "first/internal/userService"
 )
 
 type Handler struct {
 	Service *ms.MessageService
 }
+
+func NewHandler(service *ms.MessageService) *Handler {
+	return &Handler{
+		Service: service,
+	}
+}
+
+type UHandler struct {
+	uService *us.UserService
+}
+
+func NewUHandler(service *us.UserService) *UHandler {
+	return &UHandler{
+		uService: service,
+	}
+}
+
+func (h *UHandler) GetAllMessages()
 
 // DeleteMessages implements messages.StrictServerInterface.
 func (h *Handler) DeleteMessages(ctx context.Context, request messages.DeleteMessagesRequestObject) (messages.DeleteMessagesResponseObject, error) {
@@ -105,12 +126,4 @@ func (h *Handler) GetMessages(ctx context.Context, request messages.GetMessagesR
 	return response, nil
 }
 
-func NewHandler(service *ms.MessageService) *Handler {
-	return &Handler{
-		Service: service,
-	}
-}
-
 var DB = data.DB
-
-//var msg ms.Message

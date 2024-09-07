@@ -5,7 +5,7 @@ import (
 )
 
 // описание данных пользователя
-type userData struct {
+type usermess struct {
 	gorm.Model
 	email    string
 	password string
