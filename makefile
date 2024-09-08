@@ -4,6 +4,7 @@
 # Переменные которые будут использоваться в наших командах (Таргетах)
 DB_DSN := "postgres://postgres:yourpassword@localhost:5432/postgres?sslmode=disable"
 MIGRATE := migrate -path ./migrations -database $(DB_DSN)
+TESTMIGRATE:= migrate -path ./migratest -database $(DB_DSN)
 
 # Таргет для создания новой миграции
 migrate-new:
@@ -12,6 +13,9 @@ migrate-new:
 # Применение миграций
 migrate:
 	$(MIGRATE) up
+
+testmigrate:
+	$(TESTMIGRATE) up
 
 # Откат миграций
 migrate-down:
