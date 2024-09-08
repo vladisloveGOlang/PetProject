@@ -27,8 +27,7 @@ gen:
 	./internal/web/messages/api.gen.go
 lint:
 	golangci-lint run --out-format=colored-line-number
-
-my-gen: 
-    oapi-codegen -config openapi/.openapi -include-tags users, messages  \
+gen2:
+	oapi-codegen -config openapi/.openapi -include-tags users \
 	-package users openapi/openapi.yaml > \
 	./internal/web/users/api.gen.go

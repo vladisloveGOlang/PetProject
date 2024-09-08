@@ -10,6 +10,7 @@ import (
 	data "first/internal/database"
 
 	"first/internal/web/messages"
+	"first/internal/web/users"
 
 	"encoding/json"
 	ms "first/internal/messagesService"
@@ -34,13 +35,70 @@ type UHandler struct {
 	uService *us.UserService
 }
 
+// DeleteUsers implements users.StrictServerInterface.
+func (h *UHandler) DeleteUsers(ctx context.Context, request users.DeleteUsersRequestObject) (users.DeleteUsersResponseObject, error) {
+	ans, err := h.uService.DeleteUserById(*request.Body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return ans, nil
+}
+
+// PatchUsers implements users.StrictServerInterface.
+func (h *UHandler) PatchUsers(ctx context.Context, request users.PatchUsersRequestObject) (users.PatchUsersResponseObject, error) {
+	ans, err := h.uService.PatchUser(*request.Body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return ans, nil
+}
+
+// PostUsers implements users.StrictServerInterface.
+func (h *UHandler) PostUsers(ctx context.Context, request users.PostUsersRequestObject) (users.PostUsersResponseObject, error) {
+
+	err := h.uService.CreateNewUser(*request.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	status := true
+
+	ans := users.Ans{
+		Id:      request.Body.Id,
+		Changed: &status,
+	}
+
+	ansf := users.PostUsers201JSONResponse{
+		Id:      ans.Id,
+		Changed: ans.Changed,
+	}
+
+	return ansf, nil
+
+}
+
 func NewUHandler(service *us.UserService) *UHandler {
 	return &UHandler{
 		uService: service,
 	}
 }
 
-func (h *UHandler) GetAllMessages()
+func (h *UHandler) GetUsers(ctx context.Context, request users.GetUsersRequestObject) (users.GetUsersResponseObject, error) {
+
+	ans, err := h.uService.GetAllMessages()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var ansf users.GetUsers200JSONResponse
+
+	ansf = ans
+
+	return ansf, err
+
+}
 
 // DeleteMessages implements messages.StrictServerInterface.
 func (h *Handler) DeleteMessages(ctx context.Context, request messages.DeleteMessagesRequestObject) (messages.DeleteMessagesResponseObject, error) {

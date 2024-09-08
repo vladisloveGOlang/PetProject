@@ -137,19 +137,6 @@ func (response DeleteMessages204JSONResponse) VisitDeleteMessagesResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchMessagesResponseObject interface {
-	VisitPatchMessagesResponse(w http.ResponseWriter) error
-}
-
-type PatchMessages200JSONResponse Message
-
-func (response PatchMessages200JSONResponse) VisitPatchMessagesResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
 type GetMessagesRequestObject struct {
 }
 
@@ -167,11 +154,21 @@ func (response GetMessages200JSONResponse) VisitGetMessagesResponse(w http.Respo
 }
 
 type PatchMessagesRequestObject struct {
-	
 	Body *PatchMessagesJSONRequestBody
 }
 
+type PatchMessagesResponseObject interface {
+	VisitPatchMessagesResponse(w http.ResponseWriter) error
+}
 
+type PatchMessages200JSONResponse Message
+
+func (response PatchMessages200JSONResponse) VisitPatchMessagesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
 
 type PostMessagesRequestObject struct {
 	Body *PostMessagesJSONRequestBody

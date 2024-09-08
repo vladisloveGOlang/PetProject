@@ -5,6 +5,7 @@ import (
 	hand "first/internal/handlers"
 	ms "first/internal/messagesService"
 	"first/internal/web/messages"
+	"first/internal/web/users"
 	"log"
 
 	us "first/internal/userService"
@@ -53,6 +54,9 @@ func main() {
 
 	strictHandler := messages.NewStrictHandler(handler, nil)
 	messages.RegisterHandlers(e, strictHandler)
+
+	strictUHandler := users.NewStrictHandler(uHandler, nil)
+	users.RegisterHandlers(e, strictUHandler)
 
 	if err := e.Start(":8080"); err != nil {
 		log.Fatalf("faoled to start with err: %v", err)
